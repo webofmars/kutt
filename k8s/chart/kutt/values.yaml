@@ -1,0 +1,112 @@
+# Default values for kutt.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+kutt:
+  siteName: 'kutt'
+  defaultDomain: '127.0.0.1.xip.io:3000'
+  linkLength: '6'
+  dbHost: 'postgres'
+  dbPort: '5432'
+  dbName: 'kutt'
+  dbUser: 'kutt'
+  dbPassword: 'kutt'
+  dbSsl: 'false'
+  redisHost: 'redis'
+  redisPort: '6379'
+  redisPassword: ''
+  userLimitPerDay: '50'
+  nonUserCooldown: '0'
+  defaultMaxStatsPerLink: '5000'
+  customDomainUseHttps: 'false'
+  jwtSecret: 'thisshouldbealongandsecurekey'
+  adminEmails: 'admin@localhost'
+  recaptchaSiteKey: ''
+  recaptchaSecretKey: ''
+  googleSafeBrowsingKey: ''
+  googleAnalytics: ''
+  googleAnalyticsUniversal: ''
+  googleAnalyricsUniversal: ''
+  mailHost: 'localhost'
+  mailPort: '25'
+  mailSecure: 'false'
+  mailUser: ''
+  mailPassword: ''
+  mailFrom: 'Kutt <admin@localhost>'
+  reportEmail: 'admin@localhost'
+  contactEmail: 'admin@localhost'
+
+replicaCount: 1
+
+image:
+  repository: webofmars/kutt
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# dependencies settings
+redis:
+  nameOverride: redis
+  replicaCount: 1
+
+postgresql:
+  postgresqlUsername: kutt
+  postgresqlPassword: kutt
+  postgresqlDatabase: kutt

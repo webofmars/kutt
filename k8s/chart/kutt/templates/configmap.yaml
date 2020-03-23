@@ -1,0 +1,40 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "kutt.fullname" . }}
+  labels:
+    {{- include "kutt.labels" . | nindent 4 }}
+data:
+    # TODO: should split beetween config and secrets
+    SITE_NAME: {{ .Values.kutt.siteName }}
+    DEFAULT_DOMAIN: {{ .Values.kutt.defaultDomain }}
+    LINK_LENGTH: {{ .Values.kutt.linkLength }}
+    DB_HOST: {{ .Values.kutt.dbHost }}
+    DB_PORT: {{ .Values.kutt.dbPort }}
+    DB_NAME: {{ .Values.kutt.dbName }}
+    DB_USER: {{ .Values.kutt.dbUser }}
+    DB_PASSWORD: {{ .Values.kutt.dbPassword }}
+    DB_SSL: {{ .Values.kutt.dbSsl }}
+    REDIS_HOST: {{ .Values.kutt.redisHost }}
+    REDIS_PORT: {{ .Values.kutt.redisPort }}
+    REDIS_PASSWORD: {{ .Values.kutt.redisPassword }}
+    USER_LIMIT_PER_DAY: {{ .Values.kutt.userLimitPerDay }}
+    NON_USER_COOLDOWN: {{ .Values.kutt.nonUserCooldown }}
+    DEFAULT_MAX_STATS_PER_LINK: {{ .Values.kutt.defaultMaxStatsPerLink }}
+    CUSTOM_DOMAIN_USE_HTTPS: {{ .Values.kutt.customDomainUseHttps }}
+    JWT_SECRET: {{ .Values.kutt.jwtSecret }}
+    ADMIN_EMAILS: {{ .Values.kutt.adminEmails }}
+    RECAPTCHA_SITE_KEY: {{ .Values.kutt.recaptchaSiteKey }}
+    RECAPTCHA_SECRET_KEY: {{ .Values.kutt.recaptchaSecretKey }}
+    GOOGLE_SAFE_BROWSING_KEY: {{ .Values.kutt.googleSafeBrowsingKey }}
+    GOOGLE_ANALYTICS: {{ .Values.kutt.googleAnalytics }}
+    GOOGLE_ANALYTICS_UNIVERSAL: {{ .Values.kutt.googleAnalyticsUniversal }}
+    GOOGLE_ANALYRICS_UNIVERSAL: {{ .Values.kutt.googleAnalyricsUniversal }}
+    MAIL_HOST: {{ .Values.kutt.mailHost }}
+    MAIL_PORT: {{ .Values.kutt.mailPort }}
+    MAIL_SECURE: {{ .Values.kutt.mailSecure }}
+    MAIL_USER: {{ .Values.kutt.mailUser }}
+    MAIL_PASSWORD: {{ .Values.kutt.mailPassword }}
+    MAIL_FROM: {{ .Values.kutt.mailFrom }}
+    REPORT_EMAIL: {{ .Values.kutt.reportEmail }}
+    CONTACT_EMAIL: {{ .Values.kutt.contactEmail }}
