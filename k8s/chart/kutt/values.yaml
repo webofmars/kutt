@@ -6,13 +6,13 @@ kutt:
   siteName: 'kutt'
   defaultDomain: '127.0.0.1.xip.io:3000'
   linkLength: '6'
-  dbHost: 'postgres'
+  dbHost: 'kutt-postgresql'
   dbPort: '5432'
   dbName: 'kutt'
   dbUser: 'kutt'
   dbPassword: 'kutt'
   dbSsl: 'false'
-  redisHost: 'redis'
+  redisHost: 'kutt-redis'
   redisPort: '6379'
   redisPassword: ''
   userLimitPerDay: '50'
@@ -107,6 +107,25 @@ redis:
   replicaCount: 1
 
 postgresql:
-  postgresqlUsername: kutt
-  postgresqlPassword: kutt
-  postgresqlDatabase: kutt
+  # postgresqlUsername: kutt
+  # postgresqlPassword: kutt
+  # postgresqlDatabase: kutt
+  pgHbaConfiguration: |-
+    host  all all 0.0.0.0/0 md5
+    host  all all ::1/128   md5
+    local all postgres trust
+    local all all md5
+  # TODO: the only way to activate an extension and keep correct user and rights ?
+  initdbScripts:
+    00-kutt.sh: |
+      #!/bin/sh
+      echo "+ Creating user"
+      /opt/bitnami/postgresql/bin/psql -U postgres << _EOF_
+      CREATE USER kutt WITH PASSWORD 'kutt';
+      _EOF_
+      echo "+ Creating database"
+      /opt/bitnami/postgresql/bin/psql -U postgres -c 'CREATE DATABASE kutt;'
+      echo "+ Applying grants"
+      /opt/bitnami/postgresql/bin/psql -U postgres -c 'GRANT ALL PRIVILEGES ON DATABASE kutt to kutt;'
+      echo "+ Activating uuid-ossp extension"
+      /opt/bitnami/postgresql/bin/psql -U postgres -d kutt -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
