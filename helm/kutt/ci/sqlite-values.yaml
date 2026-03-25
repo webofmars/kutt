@@ -1,0 +1,10 @@
+kutt:
+  auth:
+    jwtSecret: "test-jwt-secret-for-ci"
+  defaultDomain: "kutt.example.com"
+  registration:
+    disallowRegistration: false
+    disallowAnonymousLinks: false
+persistence:
+  enabled: true
+  size: 500Mi

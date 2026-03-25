@@ -1,0 +1,17 @@
+kutt:
+  auth:
+    jwtSecret: "test-jwt-secret-for-ci"
+  defaultDomain: "kutt.example.com"
+mariadb:
+  enabled: true
+  auth:
+    database: kutt
+    username: kutt
+    password: "testpassword"
+    rootPassword: "rootpassword"
+redis:
+  enabled: true
+  auth:
+    enabled: false
+persistence:
+  enabled: false

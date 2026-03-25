@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kutt.fullname" . }}
+  labels:
+    {{- include "kutt.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "kutt.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "kutt.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kutt.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.kutt.port }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "kutt.fullname" . }}
+          env:
+            # JWT Secret
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kutt.jwtSecretName" . }}
+                  key: JWT_SECRET
+            # Database password (only for non-SQLite)
+            {{- if ne (include "kutt.dbClient" .) "better-sqlite3" }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kutt.dbSecretName" . }}
+                  key: {{ include "kutt.dbSecretKey" . }}
+            {{- end }}
+            # Redis password
+            {{- if eq (include "kutt.redisEnabled" .) "true" }}
+            {{- if or .Values.redis.enabled (or .Values.kutt.redis.password .Values.kutt.redis.existingSecret) }}
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kutt.redisSecretName" . }}
+                  key: {{ include "kutt.redisSecretKey" . }}
+            {{- end }}
+            {{- end }}
+            # Mail password
+            {{- if .Values.kutt.mail.enabled }}
+            - name: MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kutt.mailSecretName" . }}
+                  key: MAIL_PASSWORD
+            {{- end }}
+            # OIDC client secret
+            {{- if .Values.kutt.oidc.enabled }}
+            - name: OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kutt.oidcSecretName" . }}
+                  key: OIDC_CLIENT_SECRET
+            {{- end }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            {{- if and (eq (include "kutt.dbClient" .) "better-sqlite3") .Values.persistence.enabled }}
+            - name: data
+              mountPath: /var/lib/kutt
+            {{- end }}
+            {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        {{- if and (eq (include "kutt.dbClient" .) "better-sqlite3") .Values.persistence.enabled }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "kutt.fullname" .) }}
+        {{- end }}
+        {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
