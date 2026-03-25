@@ -1,0 +1,16 @@
+kutt:
+  auth:
+    jwtSecret: "test-jwt-secret-for-ci"
+  defaultDomain: "kutt.example.com"
+postgresql:
+  enabled: true
+  auth:
+    database: kutt
+    username: kutt
+    password: "testpassword"
+redis:
+  enabled: true
+  auth:
+    enabled: false
+persistence:
+  enabled: false

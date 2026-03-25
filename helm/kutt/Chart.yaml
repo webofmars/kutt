@@ -1,0 +1,30 @@
+apiVersion: v2
+name: kutt
+description: A Helm chart for Kutt - Free Modern URL Shortener
+type: application
+version: 0.1.0
+appVersion: "3.2.3"
+keywords:
+  - kutt
+  - url-shortener
+  - link-shortener
+icon: https://kutt.it/images/logo.svg
+home: https://kutt.it
+sources:
+  - https://github.com/webofmars/kutt
+maintainers:
+  - name: webofmars
+    url: https://github.com/webofmars
+dependencies:
+  - name: postgresql
+    version: ">=16.0.0 <17.0.0"
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: mariadb
+    version: ">=20.0.0 <21.0.0"
+    repository: https://charts.bitnami.com/bitnami
+    condition: mariadb.enabled
+  - name: redis
+    version: ">=20.0.0 <21.0.0"
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
